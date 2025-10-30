@@ -7,7 +7,7 @@ bibi will also use sensors for obstacle detection and edge avoidance. with a lit
 love u bb <3
 
 ```
-git clone [url]
+git clone https://github.com/jaddenki/bibi
 cd bibi
 git submodule update --init
 ```
