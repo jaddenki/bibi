@@ -23,9 +23,9 @@ animation_draw_scaled(&demo_anim, &display, x, y, scale);
 
 ## To do:
 
-- what animations should i include?
-  - startup
-  - low battery
-  - cleaning ?
-  - misc idle ?
+- what animations should i include? i need to match faces with states
+  - \>u< startup
+  - :T cleaning (calibrating table? dont know how this works)
+  - :) idle
+  - :/ idle (20% battery?)
 
