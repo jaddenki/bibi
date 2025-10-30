@@ -2,15 +2,10 @@
 #include "ili9341.h"
 #include "animation.h"
 #include <stdio.h>
+#include "bibi_config.h"
 
 // animations go here
 extern const uint16_t idle[]; 
-
-#define PIN_CS   13
-#define PIN_RST  12
-#define PIN_DC   17
-#define PIN_MOSI 15
-#define PIN_SCK  14
 
 void run_animation_demo(ili9341_t *display) {
     animation_t demo_anim;
@@ -44,9 +39,9 @@ int main() {
     stdio_init_all();
     
     ili9341_t display;
-    ili9341_init(&display, spi1, PIN_CS, PIN_DC, PIN_RST, PIN_MOSI, PIN_SCK);
+    ili9341_init(&display, spi1, DISPLAY_PIN_CS, DISPLAY_PIN_DC, DISPLAY_PIN_RST, DISPLAY_PIN_MOSI, DISPLAY_PIN_SCK);
     
-    while (true) {
+    while (true) { // can optimize later i guess
         run_animation_demo(&display);
         sleep_ms(1000);
     }
