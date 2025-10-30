@@ -14,18 +14,18 @@ firmware/
 
 ## design
 
-### 1. **Separation of Concerns**
+### 1. **separation of concerns**
 - **`src/`**: High-level application logic and system initialization
 - **`lib/`**: Reusable, modular components organized by function
 - **`include/`**: Global config shared across modules
 
-### 2. **Driver vs. Subsystem**
-- **Drivers** (`lib/XXX_driver/`): Low-level hardware abstraction
+### 2. **driver vs. subsystem**
+- **drivers** (`lib/XXX_driver/`): Low-level hardware abstraction
   - Direct hardware interfacing
   - No business logic
   - Example: Display driver, motor driver
   
-- **Subsystems** (`lib/XXX_subsystem/`): High-level functional modules
+- **subsystems** (`lib/XXX_subsystem/`): High-level functional modules
   - Business logic and feature implementation
   - Uses drivers to interact with hardware
   - Example: Face subsystem, navigation subsystem
