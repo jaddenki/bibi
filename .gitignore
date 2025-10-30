@@ -1,0 +1,92 @@
+# ===== Build and Binary Files =====
+build/
+*.o
+*.obj
+*.elf
+*.bin
+*.hex
+*.uf2
+*.map
+*.out
+*.log
+
+# ===== CMake Build Files =====
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+compile_commands.json
+
+# ===== Pico SDK and Toolchain =====
+# (if added as a submodule, don’t ignore the actual directory)
+pico-sdk/.idea/
+pico-sdk/build/
+pico-sdk/external/
+*.launch
+*.svd
+
+# ===== Editor / IDE Files =====
+.vscode/
+.vscode/*
+.idea/
+*.swp
+*.swo
+*.user
+*.workspace
+*.DS_Store
+Thumbs.db
+
+# ===== KiCad (Hardware) =====
+# Generated outputs
+*.bak
+*.bck
+*.kicad_prl
+*.kicad_sch-bak
+*.kicad_pcb-bak
+*.dcm
+*.net
+*.xml
+*.cache
+*.tmp
+fp-info-cache
+__pycache__/
+*-backups/
+*-save.pro
+*-save.sch
+
+# Generated fabrication outputs (these go in /hardware/fabrication)
+*.gbr
+*.drl
+*.zip
+*.bom.csv
+*.pos
+
+# ===== Python Scripts =====
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+env/
+venv/
+
+# ===== Image Assets (optional — ignore raw source if large) =====
+# Uncomment if you store large uncompressed images separately
+# firmware/assets/raw/
+# *.psd
+# *.xcf
+
+# ===== Documentation =====
+*.pdf
+*.docx
+*.pptx
+*.xlsx
+*.numbers
+*.pages
+*.key
+
+# ===== OS & Misc =====
+.DS_Store
+ehthumbs.db
+Icon?
+Thumbs.db

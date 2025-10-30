@@ -5,3 +5,9 @@ bibi is a benchtop buddy that can cruise around your desk and wipe it down for y
 bibi will also use sensors for obstacle detection and edge avoidance. with a little face on a display so it can show system feedback and have some personality while it works.  
 
 love u bb <3
+
+```
+git clone [url]
+cd bibi
+git submodule update --init
+```
