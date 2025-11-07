@@ -6,19 +6,30 @@
 // #include "distance_sensor.h"
 #include <stdio.h>
 
-void on_ir_sensor_event(uint gpio, bool is_rising) {
+static face_controller_t *g_face = NULL;
+static bool ir_object_detected = false;
+
+void on_ir_edge_detected(uint gpio, bool is_rising) {
+    if (g_face == NULL) return;
+    
     if (is_rising) {
-        printf("IR Sensor (GPIO %d): change\n", gpio);
+        ir_object_detected = !ir_object_detected;
+        
+        // Only trigger GAH on toggle ON (close detection)
+        // Ignore toggle OFF (far detection) - GAH will auto-return to IDLE
+        if (ir_object_detected) {
+            face_set_expression(g_face, FACE_GAH);
+        }
     }
 }
 
-void test_ir_sensor(uint gpio_pin) {
-    ir_sensor_init(gpio_pin, on_ir_sensor_event);
+// void test_ir_sensor(uint gpio_pin) {
+//     ir_sensor_init(gpio_pin, on_ir_sensor_event);
     
-    while (true) {
-        tight_loop_contents();
-    }
-}
+//     while (true) {
+//         tight_loop_contents();
+//     }
+// }
 
 // void test_distance_sensor(uint gpio_pin) {
 //     distance_sensor_init(gpio_pin);    
@@ -34,7 +45,6 @@ void test_ir_sensor(uint gpio_pin) {
 void run_animation_demo(ili9341_t *display) {
     face_controller_t face;
     
-    // Initialize face controller with centered position and 8x scale
     uint8_t scale = 8;
     uint16_t scaled_size = 16 * scale;
     uint16_t center_x = (240 - scaled_size) / 2;
@@ -66,5 +76,26 @@ void run_animation_demo(ili9341_t *display) {
     }
 }
 
-
+void test_face_with_ir_sensor(ili9341_t *display, uint gpio_pin) {
+    face_controller_t face;
+    
+    uint8_t scale = 8;
+    uint16_t scaled_size = 16 * scale;
+    uint16_t center_x = (240 - scaled_size) / 2;
+    uint16_t center_y = (320 - scaled_size) / 2;
+    
+    face_controller_init(&face, display, center_x, center_y, scale);
+    ili9341_fill_screen(display, 0x0000);
+    
+    g_face = &face;
+    
+    ir_sensor_init(gpio_pin, on_ir_edge_detected);
+    
+    while (true) {
+        face_update(&face);
+        face_draw(&face);
+        
+        sleep_ms(50);
+    }
+}
 
