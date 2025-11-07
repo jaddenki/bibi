@@ -27,15 +27,6 @@ void ili9341_write_data(ili9341_t *display, uint8_t data) {
     cs_deselect(display);
 }
 
-// Write 16-bit data to the display
-void ili9341_write_data16(ili9341_t *display, uint16_t data) {
-    uint8_t buf[2] = {data >> 8, data & 0xFF};
-    gpio_put(display->dc_pin, 1); // Data mode
-    cs_select(display);
-    spi_write_blocking(display->spi, buf, 2);
-    cs_deselect(display);
-}
-
 // Reset the display
 static void ili9341_reset(ili9341_t *display) {
     gpio_put(display->rst_pin, 1);
@@ -209,14 +200,6 @@ void ili9341_fill_screen(ili9341_t *display, uint16_t color) {
     ili9341_fill_rect(display, 0, 0, display->width, display->height, color);
 }
 
-// Draw a single pixel
-void ili9341_draw_pixel(ili9341_t *display, uint16_t x, uint16_t y, uint16_t color) {
-    if (x >= display->width || y >= display->height) return;
-    
-    ili9341_set_address_window(display, x, y, x, y);
-    ili9341_write_data16(display, color);
-}
-
 // Fill a rectangle
 void ili9341_fill_rect(ili9341_t *display, uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color) {
     if (x >= display->width || y >= display->height) return;
@@ -238,98 +221,3 @@ void ili9341_fill_rect(ili9341_t *display, uint16_t x, uint16_t y, uint16_t w, u
     
     cs_deselect(display);
 }
-
-// Draw a rectangle outline
-void ili9341_draw_rect(ili9341_t *display, uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color) {
-    ili9341_draw_line(display, x, y, x + w - 1, y, color);
-    ili9341_draw_line(display, x + w - 1, y, x + w - 1, y + h - 1, color);
-    ili9341_draw_line(display, x + w - 1, y + h - 1, x, y + h - 1, color);
-    ili9341_draw_line(display, x, y + h - 1, x, y, color);
-}
-
-// Draw a line
-void ili9341_draw_line(ili9341_t *display, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t color) {
-    int16_t steep = abs(y1 - y0) > abs(x1 - x0);
-    if (steep) {
-        uint16_t temp = x0; x0 = y0; y0 = temp;
-        temp = x1; x1 = y1; y1 = temp;
-    }
-
-    if (x0 > x1) {
-        uint16_t temp = x0; x0 = x1; x1 = temp;
-        temp = y0; y0 = y1; y1 = temp;
-    }
-
-    int16_t dx = x1 - x0;
-    int16_t dy = abs(y1 - y0);
-    int16_t err = dx / 2;
-    int16_t ystep = (y0 < y1) ? 1 : -1;
-
-    for (; x0 <= x1; x0++) {
-        if (steep) {
-            ili9341_draw_pixel(display, y0, x0, color);
-        } else {
-            ili9341_draw_pixel(display, x0, y0, color);
-        }
-        err -= dy;
-        if (err < 0) {
-            y0 += ystep;
-            err += dx;
-        }
-    }
-}
-
-// Draw a circle
-void ili9341_draw_circle(ili9341_t *display, uint16_t x0, uint16_t y0, uint16_t r, uint16_t color) {
-    int16_t f = 1 - r;
-    int16_t ddF_x = 1;
-    int16_t ddF_y = -2 * r;
-    int16_t x = 0;
-    int16_t y = r;
-
-    ili9341_draw_pixel(display, x0, y0 + r, color);
-    ili9341_draw_pixel(display, x0, y0 - r, color);
-    ili9341_draw_pixel(display, x0 + r, y0, color);
-    ili9341_draw_pixel(display, x0 - r, y0, color);
-
-    while (x < y) {
-        if (f >= 0) {
-            y--;
-            ddF_y += 2;
-            f += ddF_y;
-        }
-        x++;
-        ddF_x += 2;
-        f += ddF_x;
-
-        ili9341_draw_pixel(display, x0 + x, y0 + y, color);
-        ili9341_draw_pixel(display, x0 - x, y0 + y, color);
-        ili9341_draw_pixel(display, x0 + x, y0 - y, color);
-        ili9341_draw_pixel(display, x0 - x, y0 - y, color);
-        ili9341_draw_pixel(display, x0 + y, y0 + x, color);
-        ili9341_draw_pixel(display, x0 - y, y0 + x, color);
-        ili9341_draw_pixel(display, x0 + y, y0 - x, color);
-        ili9341_draw_pixel(display, x0 - y, y0 - x, color);
-    }
-}
-
-// Draw a bitmap (RGB565 format)
-void ili9341_draw_bitmap(ili9341_t *display, uint16_t x, uint16_t y, uint16_t w, uint16_t h, const uint16_t *bitmap) {
-    if (x >= display->width || y >= display->height) return;
-    if (x + w > display->width) w = display->width - x;
-    if (y + h > display->height) h = display->height - y;
-
-    ili9341_set_address_window(display, x, y, x + w - 1, y + h - 1);
-
-    gpio_put(display->dc_pin, 1); // Data mode
-    cs_select(display);
-    
-    for (uint32_t i = 0; i < w * h; i++) {
-        uint16_t color = bitmap[i];
-        uint8_t buf[2] = {color >> 8, color & 0xFF};
-        spi_write_blocking(display->spi, buf, 2);
-    }
-    
-    cs_deselect(display);
-}
-

@@ -48,16 +48,6 @@
 #define ILI9341_WIDTH  240
 #define ILI9341_HEIGHT 320
 
-// Color definitions (RGB565)
-#define BLACK   0x0000
-#define BLUE    0x001F
-#define RED     0xF800
-#define GREEN   0x07E0
-#define CYAN    0x07FF
-#define MAGENTA 0xF81F
-#define YELLOW  0xFFE0
-#define WHITE   0xFFFF
-
 // Display structure
 typedef struct {
     spi_inst_t *spi;
