@@ -8,7 +8,7 @@
 #include "bibi_config.h"
 
 void run_animation_demo(ili9341_t *display);
-void test_face_with_ir_sensor(ili9341_t *display, uint gpio_pin);
+void test_face_with_ir_sensor();
 
 volatile bool notTurning = true;
 

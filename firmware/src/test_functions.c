@@ -5,6 +5,7 @@
 #include "ir_sensor.h"
 // #include "distance_sensor.h"
 #include <stdio.h>
+#include "bibi_config.h"
 
 static face_controller_t *g_face = NULL;
 static bool ir_object_detected = false;
@@ -14,9 +15,6 @@ void on_ir_edge_detected(uint gpio, bool is_rising) {
     
     if (is_rising) {
         ir_object_detected = !ir_object_detected;
-        
-        // Only trigger GAH on toggle ON (close detection)
-        // Ignore toggle OFF (far detection) - GAH will auto-return to IDLE
         if (ir_object_detected) {
             face_set_expression(g_face, FACE_GAH);
         }
@@ -76,7 +74,10 @@ void run_animation_demo(ili9341_t *display) {
     }
 }
 
-void test_face_with_ir_sensor(ili9341_t *display, uint gpio_pin) {
+void test_face_with_ir_sensor(void) {
+    
+    ili9341_t display;
+    ili9341_init(&display, spi0, DISPLAY_PIN_CS, DISPLAY_PIN_DC, DISPLAY_PIN_RST, DISPLAY_PIN_MOSI, DISPLAY_PIN_SCK);
     face_controller_t face;
     
     uint8_t scale = 8;
@@ -84,12 +85,13 @@ void test_face_with_ir_sensor(ili9341_t *display, uint gpio_pin) {
     uint16_t center_x = (240 - scaled_size) / 2;
     uint16_t center_y = (320 - scaled_size) / 2;
     
-    face_controller_init(&face, display, center_x, center_y, scale);
-    ili9341_fill_screen(display, 0x0000);
+    face_controller_init(&face, &display, center_x, center_y, scale);
+    ili9341_fill_screen(&display, 0x0000);
     
     g_face = &face;
     
-    ir_sensor_init(gpio_pin, on_ir_edge_detected);
+    ir_sensor_init(IR_PIN_RIGHT, on_ir_edge_detected);
+    ir_sensor_init(IR_PIN_LEFT, on_ir_edge_detected);
     
     while (true) {
         face_update(&face);
