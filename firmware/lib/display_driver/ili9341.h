@@ -3,8 +3,8 @@
 
 #include "pico/stdlib.h"
 #include "hardware/spi.h"
+#include "hardware/dma.h"
 
-// ILI9341 Commands
 #define ILI9341_NOP        0x00
 #define ILI9341_SWRESET    0x01
 #define ILI9341_RDDID      0x04
@@ -44,11 +44,9 @@
 #define ILI9341_GMCTRP1    0xE0
 #define ILI9341_GMCTRN1    0xE1
 
-// Display dimensions
 #define ILI9341_WIDTH  240
 #define ILI9341_HEIGHT 320
 
-// Display structure
 typedef struct {
     spi_inst_t *spi;
     uint8_t cs_pin;
@@ -56,9 +54,8 @@ typedef struct {
     uint8_t rst_pin;
     uint16_t width;
     uint16_t height;
+    uint dma_tx;
 } ili9341_t;
-
-// Function prototypes
 void ili9341_init(ili9341_t *display, spi_inst_t *spi, uint8_t cs, uint8_t dc, uint8_t rst, uint8_t mosi, uint8_t sck);
 void ili9341_write_command(ili9341_t *display, uint8_t cmd);
 void ili9341_write_data(ili9341_t *display, uint8_t data);
@@ -71,6 +68,7 @@ void ili9341_fill_rect(ili9341_t *display, uint16_t x, uint16_t y, uint16_t w, u
 void ili9341_draw_line(ili9341_t *display, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1, uint16_t color);
 void ili9341_draw_circle(ili9341_t *display, uint16_t x0, uint16_t y0, uint16_t r, uint16_t color);
 void ili9341_draw_bitmap(ili9341_t *display, uint16_t x, uint16_t y, uint16_t w, uint16_t h, const uint16_t *bitmap);
+void ili9341_write_data_dma(ili9341_t *display, const uint8_t *data, size_t len);
 
-#endif // ILI9341_H
+#endif
 

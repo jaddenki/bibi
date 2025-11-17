@@ -1,33 +1,28 @@
 #include "ili9341.h"
 #include <stdlib.h>
 
-// Helper function to select the display
 static inline void cs_select(ili9341_t *display) {
     gpio_put(display->cs_pin, 0);
 }
 
-// Helper function to deselect the display
 static inline void cs_deselect(ili9341_t *display) {
     gpio_put(display->cs_pin, 1);
 }
 
-// Write a command to the display
 void ili9341_write_command(ili9341_t *display, uint8_t cmd) {
-    gpio_put(display->dc_pin, 0); // Command mode
+    gpio_put(display->dc_pin, 0);
     cs_select(display);
     spi_write_blocking(display->spi, &cmd, 1);
     cs_deselect(display);
 }
 
-// Write data to the display
 void ili9341_write_data(ili9341_t *display, uint8_t data) {
-    gpio_put(display->dc_pin, 1); // Data mode
+    gpio_put(display->dc_pin, 1);
     cs_select(display);
     spi_write_blocking(display->spi, &data, 1);
     cs_deselect(display);
 }
 
-// Reset the display
 static void ili9341_reset(ili9341_t *display) {
     gpio_put(display->rst_pin, 1);
     sleep_ms(5);
@@ -37,7 +32,6 @@ static void ili9341_reset(ili9341_t *display) {
     sleep_ms(150);
 }
 
-// Set the address window for drawing
 void ili9341_set_address_window(ili9341_t *display, uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1) {
     ili9341_write_command(display, ILI9341_CASET);
     ili9341_write_data(display, x0 >> 8);
@@ -54,7 +48,6 @@ void ili9341_set_address_window(ili9341_t *display, uint16_t x0, uint16_t y0, ui
     ili9341_write_command(display, ILI9341_RAMWR);
 }
 
-// Initialize the display
 void ili9341_init(ili9341_t *display, spi_inst_t *spi, uint8_t cs, uint8_t dc, uint8_t rst, uint8_t mosi, uint8_t sck) {
     display->spi = spi;
     display->cs_pin = cs;
@@ -63,11 +56,9 @@ void ili9341_init(ili9341_t *display, spi_inst_t *spi, uint8_t cs, uint8_t dc, u
     display->width = ILI9341_WIDTH;
     display->height = ILI9341_HEIGHT;
 
-    // Initialize SPI
-    spi_init(spi, 20000000); // 20 MHz
+    spi_init(spi, 20000000);
     spi_set_format(spi, 8, SPI_CPOL_0, SPI_CPHA_0, SPI_MSB_FIRST);
 
-    // Set up GPIO pins
     gpio_set_function(mosi, GPIO_FUNC_SPI);
     gpio_set_function(sck, GPIO_FUNC_SPI);
     
@@ -81,10 +72,13 @@ void ili9341_init(ili9341_t *display, spi_inst_t *spi, uint8_t cs, uint8_t dc, u
     gpio_init(rst);
     gpio_set_dir(rst, GPIO_OUT);
 
-    // Reset display
-    ili9341_reset(display);
+    display->dma_tx = dma_claim_unused_channel(true);
+    dma_channel_config c = dma_channel_get_default_config(display->dma_tx);
+    channel_config_set_transfer_data_size(&c, DMA_SIZE_8);
+    channel_config_set_dreq(&c, spi_get_dreq(spi, true));
+    dma_channel_configure(display->dma_tx, &c, &spi_get_hw(spi)->dr, NULL, 0, false);
 
-    // Initialization sequence
+    ili9341_reset(display);
     ili9341_write_command(display, 0xEF);
     ili9341_write_data(display, 0x03);
     ili9341_write_data(display, 0x80);
@@ -195,12 +189,23 @@ void ili9341_init(ili9341_t *display, spi_inst_t *spi, uint8_t cs, uint8_t dc, u
     sleep_ms(20);
 }
 
-// Fill the entire screen with a color
+void ili9341_write_data_dma(ili9341_t *display, const uint8_t *data, size_t len) {
+    gpio_put(display->dc_pin, 1);
+    cs_select(display);
+    
+    dma_channel_set_read_addr(display->dma_tx, data, false);
+    dma_channel_set_trans_count(display->dma_tx, len, true);
+    dma_channel_wait_for_finish_blocking(display->dma_tx);
+    
+    while (spi_is_busy(display->spi)) tight_loop_contents();
+    
+    cs_deselect(display);
+}
+
 void ili9341_fill_screen(ili9341_t *display, uint16_t color) {
     ili9341_fill_rect(display, 0, 0, display->width, display->height, color);
 }
 
-// Fill a rectangle
 void ili9341_fill_rect(ili9341_t *display, uint16_t x, uint16_t y, uint16_t w, uint16_t h, uint16_t color) {
     if (x >= display->width || y >= display->height) return;
     if (x + w > display->width) w = display->width - x;
@@ -208,16 +213,28 @@ void ili9341_fill_rect(ili9341_t *display, uint16_t x, uint16_t y, uint16_t w, u
 
     ili9341_set_address_window(display, x, y, x + w - 1, y + h - 1);
 
-    uint8_t color_hi = color >> 8;
-    uint8_t color_lo = color & 0xFF;
-    uint8_t buf[2] = {color_hi, color_lo};
-
-    gpio_put(display->dc_pin, 1); // Data mode
+    #define DMA_BUFFER_SIZE 1024
+    static uint8_t dma_buffer[DMA_BUFFER_SIZE];
+    
+    for (int i = 0; i < DMA_BUFFER_SIZE; i += 2) {
+        dma_buffer[i] = color >> 8;
+        dma_buffer[i + 1] = color & 0xFF;
+    }
+    
+    uint32_t total_bytes = w * h * 2;
+    
+    gpio_put(display->dc_pin, 1);
     cs_select(display);
     
-    for (uint32_t i = 0; i < w * h; i++) {
-        spi_write_blocking(display->spi, buf, 2);
+    while (total_bytes > 0) {
+        uint32_t chunk = (total_bytes > DMA_BUFFER_SIZE) ? DMA_BUFFER_SIZE : total_bytes;
+        dma_channel_set_read_addr(display->dma_tx, dma_buffer, false);
+        dma_channel_set_trans_count(display->dma_tx, chunk, true);
+        dma_channel_wait_for_finish_blocking(display->dma_tx);
+        total_bytes -= chunk;
     }
+    
+    while (spi_is_busy(display->spi)) tight_loop_contents();
     
     cs_deselect(display);
 }
