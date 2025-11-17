@@ -8,24 +8,37 @@
 // Hardware Configuration
 #define BIBI_MICROCONTROLLER_RP2350
 
-// Display Configuration
-#define DISPLAY_PIN_CS   13
-#define DISPLAY_PIN_RST  12
-#define DISPLAY_PIN_DC   17
-#define DISPLAY_PIN_MOSI 15
-#define DISPLAY_PIN_SCK  14
+// bibi face old (just for when i test cus im lazy thx)
+// #define DISPLAY_PIN_CS   13
+// #define DISPLAY_PIN_RST  12
+// #define DISPLAY_PIN_DC   17
+// #define DISPLAY_PIN_MOSI 15
+// #define DISPLAY_PIN_SCK  14
 
-// Future: Motor Configuration (to be added)
-// #define MOTOR_LEFT_PIN_A  XX
-// #define MOTOR_LEFT_PIN_B  XX
-// #define MOTOR_RIGHT_PIN_A XX
-// #define MOTOR_RIGHT_PIN_B XX
+// bibi face
+#define DISPLAY_PIN_CS   1
+#define DISPLAY_PIN_RST  4 
+#define DISPLAY_PIN_DC   5
+#define DISPLAY_PIN_MOSI 3
+#define DISPLAY_PIN_SCK  2
 
-// Future: Sensor Configuration (to be added)
-// #define SENSOR_ULTRASONIC_TRIG_PIN XX
-// #define SENSOR_ULTRASONIC_ECHO_PIN XX
+// bibi see (sensor config)
+#define IR_PIN_FRONT 47 // Vs is 5V; ADC Channel 7
+#define IR_PIN_RIGHT 8  // Vcc is 3.3V
+#define IR_PIN_LEFT  7  // Vcc is 3.3V
 
-// System Configuration
+// bibi move
+// motor 1
+#define MOTOR1_PIN_A 20
+#define MOTOR1_PIN_B 27
+
+// motor 2
+#define MOTOR2_PIN_A 19
+#define MOTOR2_PIN_A 28
+
+// bibi clean
+#define FAN_PIN 35      // PWM 9B
+
 #define SYSTEM_BAUD_RATE 115200
 
 #endif // BIBI_CONFIG_H
