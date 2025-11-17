@@ -34,7 +34,7 @@
 
 // motor 2
 #define MOTOR2_PIN_A 19
-#define MOTOR2_PIN_A 28
+#define MOTOR2_PIN_B 28
 
 // bibi clean
 #define FAN_PIN 35      // PWM 9B

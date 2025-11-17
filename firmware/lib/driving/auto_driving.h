@@ -9,5 +9,5 @@ void io_bank_handler();
 
 void timer0_irq_handler();
 
-#endif // IR_SENSOR_H
+#endif
 
