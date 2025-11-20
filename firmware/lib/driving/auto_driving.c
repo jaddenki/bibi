@@ -10,7 +10,7 @@ int state = 0;
 bool left = false;
 bool right = false;
 
-// initialize io_bank gpio handler, timer irq handler
+// initialize io_bank gpio handler, timer irq handler, and begin moving forward
 void init_auto_driving(){
     irq_set_enabled(IO_IRQ_BANK0, 1);
     gpio_add_raw_irq_handler(IR_PIN_RIGHT, io_bank_handler);
@@ -24,6 +24,10 @@ void init_auto_driving(){
     timer0_hw->inte = 1u << 0;
     irq_set_exclusive_handler(TIMER0_IRQ_0, timer0_irq_handler);
     irq_set_enabled(TIMER0_IRQ_0, 1);
+
+    stop();
+    forward_l();
+    forward_r();
 }
 
 void io_bank_handler(){
@@ -39,6 +43,7 @@ void io_bank_handler(){
     }
 
     // reverse both motors
+    stop();
     reverse_l();
     reverse_r();
     state = 0;
@@ -49,28 +54,25 @@ void timer0_irq_handler(){
     if(!state){
         if(left){
             // re-reverse left motor
+            stop();
             forward_l();
-            timer0_hw->alarm[0] = timer0_hw->timerawl + 1000000;
+            reverse_r();
         }
         else if(right){
             // re-reverse right motor
+            stop();
+            reverse_l();
             forward_r();
-            timer0_hw->alarm[0] = timer0_hw->timerawl + 1000000;
         }
+        timer0_hw->alarm[0] = timer0_hw->timerawl + 1000000;
         state = 1;
     }
     else{
-        if(left){
-            // re-reverse right motor
-            forward_r();
-            left = false;
-            notTurning = true;
-        }
-        else if(right){
-            // re-reverse left motor
-            forward_l();
-            right = false;
-            notTurning = true;
-        }
+        left = false;
+        right = false;
+        stop();
+        forward_l();
+        forward_r();
+        notTurning = true;
     }
 }

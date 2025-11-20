@@ -1,6 +1,7 @@
 #ifndef STATE_H
 #define STATE_H
 
-extern volatile bool notTurning; 
+extern volatile bool notTurning;
+extern volatile int state = 0;
 
 #endif

@@ -3,6 +3,7 @@
 #include "face_controller.h"
 #include "ir_sensor.h"
 #include "front_sensor.h"
+#include "pwm.h"
 #include "state.h"
 #include <stdio.h>
 #include "bibi_config.h"
@@ -19,6 +20,11 @@ int main() {
     ili9341_init(&display, spi1, DISPLAY_PIN_CS, DISPLAY_PIN_DC, DISPLAY_PIN_RST, DISPLAY_PIN_MOSI, DISPLAY_PIN_SCK);
     
     test_face_with_ir_sensor(&display, 35);
+
+    // initialize movement
+    init_motor_control();
+    init_adc();
+    init_auto_driving();
 
     // infinite while loop
     for(;;){

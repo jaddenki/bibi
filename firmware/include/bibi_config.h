@@ -28,13 +28,13 @@
 #define IR_PIN_LEFT  7  // Vcc is 3.3V
 
 // bibi move
-// motor 1
-#define MOTOR1_PIN_A 20
-#define MOTOR1_PIN_B 27
+// motor left
+#define MOTOR_L_PIN_A 20
+#define MOTOR_L_PIN_B 27
 
-// motor 2
-#define MOTOR2_PIN_A 19
-#define MOTOR2_PIN_B 28
+// motor right
+#define MOTOR_R_PIN_A 19
+#define MOTOR_R_PIN_B 28
 
 // bibi clean
 #define FAN_PIN 35      // PWM 9B
