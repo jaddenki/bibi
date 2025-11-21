@@ -39,6 +39,9 @@
 // bibi clean
 #define FAN_PIN 35      // PWM 9B
 
+// bibi random
+#define RAND_BUTTON 26
+
 #define SYSTEM_BAUD_RATE 115200
 
 #endif // BIBI_CONFIG_H

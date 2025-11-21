@@ -26,6 +26,9 @@ int main() {
     init_adc();
     init_auto_driving();
 
+    // initialize fan
+    init_fan();
+
     // infinite while loop
     for(;;){
         // animation

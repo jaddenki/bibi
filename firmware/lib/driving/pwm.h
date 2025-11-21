@@ -3,7 +3,9 @@
 
 #include "pico/stdlib.h"
 
-void init_pwm();
+void init_fan();
+
+void fan_button_irq_handler();
 
 void init_motor_control();
 
