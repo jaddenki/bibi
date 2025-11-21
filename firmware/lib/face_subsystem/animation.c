@@ -71,3 +71,36 @@ void animation_draw_frame_scaled(animation_t *anim, ili9341_t *display, uint16_t
         }
     }
 }
+
+
+void animation_draw_rotated(animation_t *anim, ili9341_t *display, uint16_t x, uint16_t y, uint8_t scale) {
+    animation_draw_frame_rotated(anim, display, x, y, anim->current_frame, scale);
+}
+
+void animation_draw_frame_rotated(animation_t *anim, ili9341_t *display, uint16_t x, uint16_t y, uint16_t frame_index, uint8_t scale) {
+    if (frame_index >= anim->num_frames) return;
+    if (scale == 0) scale = 1;
+
+    uint32_t frame_size = anim->frame_width * anim->frame_height;
+    const uint16_t *frame_data = anim->sprite_sheet + (frame_index * frame_size);
+
+    uint16_t orig_w = anim->frame_width;
+    uint16_t orig_h = anim->frame_height;
+
+    uint16_t rot_w = orig_h;
+    uint16_t rot_h = orig_w;
+
+    for (uint16_t ry = 0; ry < rot_h; ry++) {
+        for (uint16_t rx = 0; rx < rot_w; rx++) {
+            // src_row = orig_h - 1 - rx
+            // src_col = ry
+            uint16_t src_row = orig_h - 1 - rx;
+            uint16_t src_col = ry;
+            uint16_t color = frame_data[src_row * orig_w + src_col];
+
+            uint16_t draw_x = x + (rx * scale);
+            uint16_t draw_y = y + (ry * scale);
+            ili9341_fill_rect(display, draw_x, draw_y, scale, scale, color);
+        }
+    }
+}

@@ -1,12 +1,11 @@
 #include "auto_driving.h"
 #include "pwm.h"
-#include "bibi_config.h"
+#include "../../include/bibi_config.h"
 #include "state.h"
 #include "hardware/timer.h"
 #include "hardware/irq.h"
 #include <stdio.h>
 
-int state = 0;
 bool left = false;
 bool right = false;
 

@@ -48,7 +48,7 @@ void run_animation_demo(ili9341_t *display) {
     uint16_t center_x = (240 - scaled_size) / 2;
     uint16_t center_y = (320 - scaled_size) / 2;
     
-    face_controller_init(&face, display, center_x, center_y, scale);
+    face_controller_init(&face, display, center_x, center_y, scale, false);
     ili9341_fill_screen(display, 0x0000);
     
     // cycle through different expressions
@@ -85,7 +85,7 @@ void test_face_with_ir_sensor(void) {
     uint16_t center_x = (240 - scaled_size) / 2;
     uint16_t center_y = (320 - scaled_size) / 2;
     
-    face_controller_init(&face, &display, center_x, center_y, scale);
+    face_controller_init(&face, &display, center_x, center_y, scale, true);
     ili9341_fill_screen(&display, 0x0000);
     
     g_face = &face;
