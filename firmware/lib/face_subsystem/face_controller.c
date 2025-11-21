@@ -5,11 +5,12 @@ extern const uint16_t eat[];
 extern const uint16_t gah[];
 
 void face_controller_init(face_controller_t *face, ili9341_t *display, 
-                         uint16_t x_pos, uint16_t y_pos, uint8_t scale) {
+                         uint16_t x_pos, uint16_t y_pos, uint8_t scale, bool rotate90) {
     face->display = display;
     face->x_pos = x_pos;
     face->y_pos = y_pos;
     face->scale = scale;
+    face->rotate90 = rotate90;
     
     // idle: 16x16, 4 frames, 200ms per frame, loop
     animation_init(&face->idle_anim, idle, 16, 16, 4, 200, true);
@@ -63,7 +64,12 @@ void face_update(face_controller_t *face) {
 }
 
 void face_draw(face_controller_t *face) {
-    animation_draw_scaled(face->current_anim, face->display, 
-                         face->x_pos, face->y_pos, face->scale);
+    if (face->rotate90) {
+        animation_draw_rotated(face->current_anim, face->display,
+                              face->x_pos, face->y_pos, face->scale);
+    } else {
+        animation_draw_scaled(face->current_anim, face->display,
+                              face->x_pos, face->y_pos, face->scale);
+    }
 }
 

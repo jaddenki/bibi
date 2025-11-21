@@ -1,5 +1,5 @@
 #include "pwm.h"
-#include "bibi_config.h"
+#include "../../include/bibi_config.h"
 #include "hardware/pwm.h"
 #include "state.h"
 #include <stdio.h>

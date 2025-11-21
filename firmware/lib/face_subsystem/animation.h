@@ -47,6 +47,11 @@ void animation_draw_frame(animation_t *anim, ili9341_t *display, uint16_t x, uin
 void animation_draw_scaled(animation_t *anim, ili9341_t *display, uint16_t x, uint16_t y, uint8_t scale);
 void animation_draw_frame_scaled(animation_t *anim, ili9341_t *display, uint16_t x, uint16_t y, uint16_t frame_index, uint8_t scale);
 
+// Rotated drawing: draws a frame rotated 90 degrees clockwise.
+// Note: rotated frame has width = original height, height = original width.
+void animation_draw_frame_rotated(animation_t *anim, ili9341_t *display, uint16_t x, uint16_t y, uint16_t frame_index, uint8_t scale);
+void animation_draw_rotated(animation_t *anim, ili9341_t *display, uint16_t x, uint16_t y, uint8_t scale);
+
 // Function prototypes for individual frame animations
 void animation_frames_init(animation_frames_t *anim, const uint16_t **frames,
                           uint16_t frame_width, uint16_t frame_height,

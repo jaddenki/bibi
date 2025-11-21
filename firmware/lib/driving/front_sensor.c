@@ -1,5 +1,5 @@
 #include "front_sensor.h"
-#include "bibi_config.h"
+#include "../../include/bibi_config.h"
 #include "state.h"
 #include "pwm.h"
 #include "hardware/adc.h"

@@ -22,10 +22,11 @@ typedef struct {
     uint16_t x_pos;
     uint16_t y_pos;
     uint8_t scale;
+    bool rotate90; // if true, draw frames rotated 90deg clockwise
 } face_controller_t;
 
 void face_controller_init(face_controller_t *face, ili9341_t *display, 
-                         uint16_t x_pos, uint16_t y_pos, uint8_t scale);
+                         uint16_t x_pos, uint16_t y_pos, uint8_t scale, bool rotate90);
 
 void face_set_expression(face_controller_t *face, face_expression_t expression);
 
