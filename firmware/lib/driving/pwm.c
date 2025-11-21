@@ -1,6 +1,7 @@
 #include "pwm.h"
 #include "bibi_config.h"
 #include "hardware/pwm.h"
+#include "state.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -21,13 +22,17 @@ void init_fan(){
     gpio_add_raw_irq_handler(RAND_BUTTON, fan_button_irq_handler);
     gpio_set_irq_enabled(RAND_BUTTON, GPIO_IRQ_EDGE_RISE, 1);
     gpio_init(RAND_BUTTON);
-
+    notRandomizing = true;
 }
 
 void fan_button_irq_handler(){
     if(gpio_get_irq_event_mask(RAND_BUTTON) == GPIO_IRQ_EDGE_RISE){
         gpio_acknowledge_irq(RAND_BUTTON, GPIO_IRQ_EDGE_FALL);
-        pwm_set_chan_level(pwm_gpio_to_slice_num(FAN_PIN), PWM_CHAN_B, rand() % 10000);
+        if(notRandomizing){
+            notRandomizing = false;
+            pwm_set_chan_level(pwm_gpio_to_slice_num(FAN_PIN), PWM_CHAN_B, rand() % 10000);
+            notRandomizing = true;
+        }
     }
 }
 

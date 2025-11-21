@@ -3,5 +3,6 @@
 
 extern volatile bool notTurning;
 extern volatile int state = 0;
+extern volatile bool notRandomizing;
 
 #endif

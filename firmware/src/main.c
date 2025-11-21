@@ -34,7 +34,7 @@ int main() {
         // animation
 
         // front sensor reading
-        if (notTurning) {
+        if(notTurning){
             interpret_front_sensor(read_adc());
         }
     }

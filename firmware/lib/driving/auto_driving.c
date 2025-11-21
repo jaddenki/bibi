@@ -6,7 +6,6 @@
 #include "hardware/irq.h"
 #include <stdio.h>
 
-int state = 0;
 bool left = false;
 bool right = false;
 
@@ -24,6 +23,9 @@ void init_auto_driving(){
     timer0_hw->inte = 1u << 0;
     irq_set_exclusive_handler(TIMER0_IRQ_0, timer0_irq_handler);
     irq_set_enabled(TIMER0_IRQ_0, 1);
+
+    state = 0;
+    notTurning = true;
 
     stop();
     forward_l();
