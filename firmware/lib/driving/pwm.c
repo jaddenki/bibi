@@ -22,7 +22,11 @@ void init_fan(){
     gpio_add_raw_irq_handler(RAND_BUTTON, fan_button_irq_handler);
     gpio_set_irq_enabled(RAND_BUTTON, GPIO_IRQ_EDGE_RISE, 1);
     gpio_init(RAND_BUTTON);
-    notRandomizing = true;
+
+    // init timer for delay in randomizing
+    timer1_hw->inte = 1u << 0;
+    irq_set_exclusive_handler(TIMER1_IRQ_0, timer1_irq_handler);
+    irq_set_enabled(TIMER1_IRQ_0, 1);
 }
 
 void fan_button_irq_handler(){
@@ -31,45 +35,32 @@ void fan_button_irq_handler(){
         if(notRandomizing){
             notRandomizing = false;
             pwm_set_chan_level(pwm_gpio_to_slice_num(FAN_PIN), PWM_CHAN_B, rand() % 10000);
-            notRandomizing = true;
+            timer1_hw->alarm[0] = timer1_hw->timerawl + 400000;
         }
     }
 }
 
+void timer1_irq_handler(){
+    timer1_hw->intr = 1u << 0;
+    notRandomizing = true;
+}
+
 void init_motor_control(){
     gpio_init(MOTOR_L_PIN_A);
-    gpio_init(MOTOR_L_PIN_B);
     gpio_init(MOTOR_R_PIN_A);
-    gpio_init(MOTOR_R_PIN_B);
     gpio_set_dir(MOTOR_L_PIN_A, 1);
-    gpio_set_dir(MOTOR_L_PIN_B, 1);
     gpio_set_dir(MOTOR_R_PIN_A, 1);
-    gpio_set_dir(MOTOR_R_PIN_B, 1);
 }
 
 void forward_l(){
     gpio_put(MOTOR_L_PIN_A, 1);
-    gpio_put(MOTOR_L_PIN_B, 0);
 }
 
 void forward_r(){
-    gpio_put(MOTOR_R_PIN_A, 0);
-    gpio_put(MOTOR_R_PIN_B, 1);
-}
-
-void reverse_l(){
-    gpio_put(MOTOR_L_PIN_A, 0);
-    gpio_put(MOTOR_L_PIN_B, 1);
-}
-
-void reverse_r(){
     gpio_put(MOTOR_R_PIN_A, 1);
-    gpio_put(MOTOR_R_PIN_B, 0);
 }
 
 void stop(){
     gpio_put(MOTOR_L_PIN_A, 0);
-    gpio_put(MOTOR_L_PIN_B, 0);
     gpio_put(MOTOR_R_PIN_A, 0);
-    gpio_put(MOTOR_R_PIN_B, 0);
 }

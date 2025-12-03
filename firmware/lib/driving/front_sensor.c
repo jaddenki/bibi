@@ -27,9 +27,7 @@ void interpret_front_sensor(uint16_t value) {
         // begin turning sequence
         notTurning = false;
         stop();
-        reverse_l();
-        reverse_r();
-        state = 0;
+        forward_l();
         timer0_hw->alarm[0] = timer0_hw->timerawl + 1000000; // 1 second
     }
 }

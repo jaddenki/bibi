@@ -7,6 +7,8 @@ void init_fan();
 
 void fan_button_irq_handler();
 
+void timer1_irq_handler();
+
 void init_motor_control();
 
 void forward_l();
