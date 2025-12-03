@@ -10,8 +10,6 @@
 bool left = false;
 bool right = false;
 
-// face controller 
-face_controller_t *g_face = NULL;
 
 // initialize io_bank gpio handler, timer irq handler, and begin moving forward
 void init_auto_driving(){
@@ -49,9 +47,9 @@ void io_bank_handler(){
     }
 
     // change face when obstacle detected
-    if (g_face != NULL) {
-        face_set_expression(g_face, FACE_GAH);
-    }
+    // if (g_face != NULL) {
+    //     face_set_expression(g_face, FACE_GAH);
+    // }
 
     // reverse both motors
     stop();
@@ -90,8 +88,8 @@ void timer0_irq_handler(){
         notTurning = true;
         
         // return to idle face
-        if (g_face != NULL) {
-            face_set_expression(g_face, FACE_IDLE);
-        }
+        // if (g_face != NULL) {
+        //     face_set_expression(g_face, FACE_IDLE);
+        // }
     }
 }

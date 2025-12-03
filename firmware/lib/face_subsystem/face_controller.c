@@ -4,6 +4,8 @@ extern const uint16_t idle[];
 extern const uint16_t eat[];
 extern const uint16_t gah[];
 
+face_controller_t *g_face = NULL;
+
 void face_controller_init(face_controller_t *face, ili9341_t *display, 
                          uint16_t x_pos, uint16_t y_pos, uint8_t scale, bool rotate90) {
     face->display = display;
@@ -71,5 +73,21 @@ void face_draw(face_controller_t *face) {
         animation_draw_scaled(face->current_anim, face->display,
                               face->x_pos, face->y_pos, face->scale);
     }
+}
+
+void init_face(void) {
+    static ili9341_t display;
+    static face_controller_t face;
+    ili9341_init(&display, spi0, DISPLAY_PIN_CS, DISPLAY_PIN_DC, DISPLAY_PIN_RST, DISPLAY_PIN_MOSI, DISPLAY_PIN_SCK);
+    
+    uint8_t scale = 8;
+    uint16_t scaled_size = 16 * scale;
+    uint16_t center_x = (240 - scaled_size) / 2;
+    uint16_t center_y = (320 - scaled_size) / 2;
+    
+    face_controller_init(&face, &display, center_x, center_y, scale, true);
+    ili9341_fill_screen(&display, 0x0000);
+    
+    g_face = &face;
 }
 

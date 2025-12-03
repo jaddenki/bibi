@@ -23,21 +23,21 @@
 #define DISPLAY_PIN_SCK  2
 
 // bibi see (sensor config)
-#define IR_PIN_FRONT 47 // Vs is 5V; ADC Channel 7
-#define IR_PIN_RIGHT 8  // Vcc is 3.3V
-#define IR_PIN_LEFT  7  // Vcc is 3.3V
+#define IR_PIN_FRONT 47  // Vs is 5V; ADC Channel 7
+#define IR_PIN_RIGHT 37  // Vcc is 3.3V
+#define IR_PIN_LEFT  10  // Vcc is 3.3V
 
 // bibi move
 // motor left
-#define MOTOR_L_PIN_A 20
+#define MOTOR_L_PIN_A 27
 #define MOTOR_L_PIN_B 27
 
 // motor right
-#define MOTOR_R_PIN_A 19
+#define MOTOR_R_PIN_A 20
 #define MOTOR_R_PIN_B 28
 
 // bibi clean
-#define FAN_PIN 35      // PWM 9B
+#define FAN_PIN 23
 
 // bibi random
 #define RAND_BUTTON 26

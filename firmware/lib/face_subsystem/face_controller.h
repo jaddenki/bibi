@@ -3,6 +3,7 @@
 
 #include "animation.h"
 #include "ili9341.h"
+#include "../../include/bibi_config.h"
 
 typedef enum {
     FACE_IDLE,
@@ -33,6 +34,8 @@ void face_set_expression(face_controller_t *face, face_expression_t expression);
 void face_update(face_controller_t *face);
 
 void face_draw(face_controller_t *face);
+
+void init_face();
 
 #endif // FACE_CONTROLLER_H
 

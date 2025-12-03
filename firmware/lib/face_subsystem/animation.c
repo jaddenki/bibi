@@ -52,18 +52,14 @@ void animation_draw_scaled(animation_t *anim, ili9341_t *display, uint16_t x, ui
 
 void animation_draw_frame_scaled(animation_t *anim, ili9341_t *display, uint16_t x, uint16_t y, uint16_t frame_index, uint8_t scale) {
     if (frame_index >= anim->num_frames) return;
-    if (scale == 0) scale = 1;  // Prevent division by zero
-
-    // Calculate the offset in the sprite sheet for this frame
+    if (scale == 0) scale = 1; 
     uint32_t frame_size = anim->frame_width * anim->frame_height;
     const uint16_t *frame_data = anim->sprite_sheet + (frame_index * frame_size);
 
-    // Draw each pixel as a scale×scale block
     for (uint16_t py = 0; py < anim->frame_height; py++) {
         for (uint16_t px = 0; px < anim->frame_width; px++) {
             uint16_t color = frame_data[py * anim->frame_width + px];
             
-            // Draw a scale×scale rectangle for this pixel
             uint16_t draw_x = x + (px * scale);
             uint16_t draw_y = y + (py * scale);
             
