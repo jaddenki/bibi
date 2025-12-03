@@ -2,7 +2,9 @@
 #include "../../include/bibi_config.h"
 #include "state.h"
 #include "pwm.h"
+#include "face_controller.h"
 #include "hardware/adc.h"
+#include "hardware/timer.h"
 #include <stdio.h>
 
 void init_adc() {
@@ -12,11 +14,16 @@ void init_adc() {
 }
 
 uint16_t read_adc() {
-    adc_read();
+    return adc_read();
 }
 
 void interpret_front_sensor(uint16_t value) {
     if(value > 0x4000){
+        // obstacle detected in front
+        if (g_face != NULL) {
+            face_set_expression(g_face, FACE_GAH);
+        }
+        
         // begin turning sequence
         notTurning = false;
         stop();

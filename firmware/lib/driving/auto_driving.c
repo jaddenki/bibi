@@ -2,12 +2,16 @@
 #include "pwm.h"
 #include "../../include/bibi_config.h"
 #include "state.h"
+#include "face_controller.h"
 #include "hardware/timer.h"
 #include "hardware/irq.h"
 #include <stdio.h>
 
 bool left = false;
 bool right = false;
+
+// face controller 
+face_controller_t *g_face = NULL;
 
 // initialize io_bank gpio handler, timer irq handler, and begin moving forward
 void init_auto_driving(){
@@ -44,6 +48,11 @@ void io_bank_handler(){
         notTurning = false;
     }
 
+    // change face when obstacle detected
+    if (g_face != NULL) {
+        face_set_expression(g_face, FACE_GAH);
+    }
+
     // reverse both motors
     stop();
     reverse_l();
@@ -53,6 +62,9 @@ void io_bank_handler(){
 }
 
 void timer0_irq_handler(){
+    // clear interrupt
+    timer0_hw->intr = 1u << 0;
+    
     if(!state){
         if(left){
             // re-reverse left motor
@@ -76,5 +88,10 @@ void timer0_irq_handler(){
         forward_l();
         forward_r();
         notTurning = true;
+        
+        // return to idle face
+        if (g_face != NULL) {
+            face_set_expression(g_face, FACE_IDLE);
+        }
     }
 }

@@ -10,7 +10,7 @@ typedef enum {
     FACE_GAH
 } face_expression_t;
 
-typedef struct {
+typedef struct face_controller_t {
     animation_t idle_anim;
     animation_t eat_anim;
     animation_t gah_anim;
