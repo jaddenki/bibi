@@ -35,7 +35,9 @@ void face_update(face_controller_t *face);
 
 void face_draw(face_controller_t *face);
 
-void init_face();
+void init_face(void);
+
+extern face_controller_t *g_face;
 
 #endif // FACE_CONTROLLER_H
 

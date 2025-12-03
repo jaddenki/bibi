@@ -42,6 +42,10 @@ int main() {
             face_draw(g_face);
             interpret_front_sensor(read_adc());
         }
+        else {
+            face_update(g_face);
+            face_draw(g_face);
+        }
     }
     
     return 0;

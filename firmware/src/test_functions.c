@@ -7,7 +7,7 @@
 #include <stdio.h>
 #include "bibi_config.h"
 
-static face_controller_t *g_face = NULL;
+// static face_controller_t *g_face = NULL;
 static bool ir_object_detected = false;
 
 void on_ir_edge_detected(uint gpio, bool is_rising) {
