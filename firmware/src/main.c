@@ -35,7 +35,11 @@ int main() {
     // initialize fan
     init_fan();
 
+    printf("good morning\n");
+    printf("godo moringin again\n");
+
     for(;;) {
+            // interpret_front_sensor(read_adc());
         if(notTurning) {
             face_update(g_face);
             face_draw(g_face);

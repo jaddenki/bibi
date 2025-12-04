@@ -72,11 +72,28 @@ void ili9341_init(ili9341_t *display, spi_inst_t *spi, uint8_t cs, uint8_t dc, u
     gpio_init(rst);
     gpio_set_dir(rst, GPIO_OUT);
 
-    display->dma_tx = dma_claim_unused_channel(true);
-    dma_channel_config c = dma_channel_get_default_config(display->dma_tx);
-    channel_config_set_transfer_data_size(&c, DMA_SIZE_8);
-    channel_config_set_dreq(&c, spi_get_dreq(spi, true));
-    dma_channel_configure(display->dma_tx, &c, &spi_get_hw(spi)->dr, NULL, 0, false);
+    // ===== DMA SETUP USING DIRECT REGISTER ACCESS =====
+    // Claim DMA channel 0 for SPI TX
+    display->dma_tx = 0;
+    dma_channel_claim(display->dma_tx);
+    
+    // Set write address to SPI data register (fixed, doesn't increment)
+    dma_hw->ch[display->dma_tx].write_addr = (uintptr_t)&spi_get_hw(spi)->dr;
+    
+    // Build control register value:
+    // Bit 0:     EN (enable) - leave 0 for now, set when starting transfer
+    // Bits 3:2:  DATA_SIZE = 0 (DMA_SIZE_8 = byte transfers)
+    // Bit 4:     INCR_READ = 1 (increment source address)
+    // Bit 5:     INCR_WRITE = 0 (fixed destination - SPI DR)
+    // Bits 20:15: TREQ_SEL = DREQ for SPI TX (paces transfer to SPI)
+    uint dreq = spi_get_dreq(spi, true);  // Get correct DREQ for this SPI instance
+    uint32_t ctrl = (DMA_SIZE_8 << 2)     // 8-bit transfers
+                  | (1 << 4)              // Increment read address
+                  | (0 << 5)              // Don't increment write address (SPI DR is fixed)
+                  | (dreq << 15);         // DREQ paces transfer
+    
+    // Write to ctrl (not ctrl_trig) to configure without starting
+    dma_hw->ch[display->dma_tx].ctrl_trig = ctrl;
 
     ili9341_reset(display);
     ili9341_write_command(display, 0xEF);
@@ -185,6 +202,8 @@ void ili9341_init(ili9341_t *display, spi_inst_t *spi, uint8_t cs, uint8_t dc, u
     ili9341_write_command(display, ILI9341_SLPOUT);
     sleep_ms(120);
 
+    ili9341_write_command(display, ILI9341_INVON);
+
     ili9341_write_command(display, ILI9341_DISPON);
     sleep_ms(20);
 }
@@ -193,12 +212,16 @@ void ili9341_write_data_dma(ili9341_t *display, const uint8_t *data, size_t len)
     gpio_put(display->dc_pin, 1);
     cs_select(display);
     
-    dma_channel_set_read_addr(display->dma_tx, data, false);
-    dma_channel_set_trans_count(display->dma_tx, len, true);
-    dma_channel_wait_for_finish_blocking(display->dma_tx);
+    dma_hw->ch[display->dma_tx].read_addr = (uintptr_t)data;
     
+    dma_hw->ch[display->dma_tx].transfer_count = len;
+    
+    dma_hw->ch[display->dma_tx].ctrl_trig |= (1 << 0);
+    
+    while (dma_hw->ch[display->dma_tx].ctrl_trig & (1 << 24)) {
+        tight_loop_contents();
+    }
     while (spi_is_busy(display->spi)) tight_loop_contents();
-    
     cs_deselect(display);
 }
 
@@ -228,9 +251,13 @@ void ili9341_fill_rect(ili9341_t *display, uint16_t x, uint16_t y, uint16_t w, u
     
     while (total_bytes > 0) {
         uint32_t chunk = (total_bytes > DMA_BUFFER_SIZE) ? DMA_BUFFER_SIZE : total_bytes;
-        dma_channel_set_read_addr(display->dma_tx, dma_buffer, false);
-        dma_channel_set_trans_count(display->dma_tx, chunk, true);
-        dma_channel_wait_for_finish_blocking(display->dma_tx);
+        dma_hw->ch[display->dma_tx].read_addr = (uintptr_t)dma_buffer;
+        dma_hw->ch[display->dma_tx].transfer_count = chunk;
+        dma_hw->ch[display->dma_tx].ctrl_trig |= (1 << 0);
+        while (dma_hw->ch[display->dma_tx].ctrl_trig & (1 << 24)) {
+            tight_loop_contents();
+        }
+        
         total_bytes -= chunk;
     }
     
