@@ -3,6 +3,7 @@
 extern const uint16_t idle[];
 extern const uint16_t eat[];
 extern const uint16_t gah[];
+extern const uint16_t gamblibi[];
 
 face_controller_t *g_face = NULL;
 
@@ -22,6 +23,9 @@ void face_controller_init(face_controller_t *face, ili9341_t *display,
     
     // gah: 16x16, 8 frames, 50ms per frame, don't loop (play once)
     animation_init(&face->gah_anim, gah, 16, 16, 8, 50, false);
+    
+    // gambling: 16x16, 8 frames, 50ms per frame, don't loop (play once)
+    animation_init(&face->gambling_anim, gamblibi, 16, 16, 8, 50, false);
     
     face->current_expression = FACE_IDLE;
     face->current_anim = &face->idle_anim;
@@ -45,13 +49,16 @@ void face_set_expression(face_controller_t *face, face_expression_t expression) 
         case FACE_GAH:
             face->current_anim = &face->gah_anim;
             break;
+        case FACE_GAMBLING:
+            face->current_anim = &face->gambling_anim;
+            break;
     }
     
     face->current_anim->current_frame = 0;
     animation_start(face->current_anim);
     
-    // when gah finished, return to idle
-    if (expression == FACE_GAH && !face->current_anim->playing) {
+    // when gah or gambling finished, return to idle
+    if ((expression == FACE_GAH || expression == FACE_GAMBLING) && !face->current_anim->playing) {
         face_set_expression(face, FACE_IDLE);
     }
 }
@@ -59,8 +66,9 @@ void face_set_expression(face_controller_t *face, face_expression_t expression) 
 void face_update(face_controller_t *face) {
     animation_update(face->current_anim);
     
-    // when gah finished, return to idle
-    if (face->current_expression == FACE_GAH && !face->current_anim->playing) {
+    // when gah or gambling finished, return to idle
+    if ((face->current_expression == FACE_GAH || face->current_expression == FACE_GAMBLING) 
+        && !face->current_anim->playing) {
         face_set_expression(face, FACE_IDLE);
     }
 }
