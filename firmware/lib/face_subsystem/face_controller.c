@@ -24,9 +24,10 @@ void face_controller_init(face_controller_t *face, ili9341_t *display,
     // gah: 16x16, 8 frames, 50ms per frame, don't loop (play once)
     animation_init(&face->gah_anim, gah, 16, 16, 8, 50, false);
     
-    // gambling: 16x16, 8 frames, 50ms per frame, don't loop (play once)
-    animation_init(&face->gambling_anim, gamblibi, 16, 16, 8, 50, false);
-    
+
+    // gamblibi: 16x16, 10 frames, 125ms per frame, don't loop (play once)
+    animation_init(&face->gamblibi_anim, gamblibi, 16, 16, 10, 125, false);
+
     face->current_expression = FACE_IDLE;
     face->current_anim = &face->idle_anim;
     animation_start(face->current_anim);
@@ -49,16 +50,17 @@ void face_set_expression(face_controller_t *face, face_expression_t expression) 
         case FACE_GAH:
             face->current_anim = &face->gah_anim;
             break;
-        case FACE_GAMBLING:
-            face->current_anim = &face->gambling_anim;
+        case FACE_GAMBLIBI:
+            face->current_anim = &face->gamblibi_anim;
             break;
     }
     
     face->current_anim->current_frame = 0;
     animation_start(face->current_anim);
     
-    // when gah or gambling finished, return to idle
-    if ((expression == FACE_GAH || expression == FACE_GAMBLING) && !face->current_anim->playing) {
+    // when gah or gamblibi finished, return to idle
+    if ((face->current_expression == FACE_GAH || face->current_expression == FACE_GAMBLIBI) 
+        && !face->current_anim->playing) {
         face_set_expression(face, FACE_IDLE);
     }
 }
@@ -66,11 +68,13 @@ void face_set_expression(face_controller_t *face, face_expression_t expression) 
 void face_update(face_controller_t *face) {
     animation_update(face->current_anim);
     
-    // when gah or gambling finished, return to idle
-    if ((face->current_expression == FACE_GAH || face->current_expression == FACE_GAMBLING) 
+    // when gah or gmbling finished, return to idle
+    if ((face->current_expression == FACE_GAH || face->current_expression == FACE_GAMBLIBI) 
         && !face->current_anim->playing) {
         face_set_expression(face, FACE_IDLE);
-    }
+            
+        }
+
 }
 
 void face_draw(face_controller_t *face) {

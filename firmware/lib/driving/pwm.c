@@ -1,5 +1,6 @@
 #include "pwm.h"
 #include "../../include/bibi_config.h"
+#include "../face_subsystem/face_controller.h"
 #include "hardware/pwm.h"
 #include "state.h"
 #include "../face_subsystem/face_controller.h"
@@ -32,15 +33,13 @@ void init_fan(){
 
 void fan_button_irq_handler(){
     if(gpio_get_irq_event_mask(RAND_BUTTON) == GPIO_IRQ_EDGE_RISE){
-        gpio_acknowledge_irq(RAND_BUTTON, GPIO_IRQ_EDGE_FALL);
+        gpio_acknowledge_irq(RAND_BUTTON, GPIO_IRQ_EDGE_RISE);
         if(notRandomizing){
             notRandomizing = false;
-            pwm_set_chan_level(pwm_gpio_to_slice_num(FAN_PIN), PWM_CHAN_B, (rand() % 7000) + 3000);
-            timer1_hw->alarm[0] = timer1_hw->timerawl + 1250000;
-            
-            // GAMBLIBIIIIII
+            pwm_set_chan_level(pwm_gpio_to_slice_num(FAN_PIN), PWM_CHAN_B, rand() % 10000);
+            timer1_hw->alarm[0] = timer1_hw->timerawl + 400000;
             if (g_face != NULL) {
-                face_set_expression(g_face, FACE_GAMBLING);
+                face_set_expression(g_face, FACE_GAMBLIBI);
             }
         }
     }

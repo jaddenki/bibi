@@ -9,14 +9,14 @@ typedef enum {
     FACE_IDLE,
     FACE_EAT,
     FACE_GAH,
-    FACE_GAMBLING
+    FACE_GAMBLIBI
 } face_expression_t;
 
 typedef struct face_controller_t {
     animation_t idle_anim;
     animation_t eat_anim;
     animation_t gah_anim;
-    animation_t gambling_anim;
+    animation_t gamblibi_anim;
     
     animation_t *current_anim;
     face_expression_t current_expression;

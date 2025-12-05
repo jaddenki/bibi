@@ -28,25 +28,30 @@ void init_auto_driving(){
 }
 
 void io_bank_handler(){
+    bool obstacle_detected = false;
+    
     if(gpio_get_irq_event_mask(IR_PIN_RIGHT) == GPIO_IRQ_EDGE_FALL){
         gpio_acknowledge_irq(IR_PIN_RIGHT, GPIO_IRQ_EDGE_FALL);
         notTurning = false;
         stop();
         forward_r();
+        obstacle_detected = true;
     }
     else if(gpio_get_irq_event_mask(IR_PIN_LEFT) == GPIO_IRQ_EDGE_FALL){
         gpio_acknowledge_irq(IR_PIN_LEFT, GPIO_IRQ_EDGE_FALL);
         notTurning = false;
         stop();
         forward_l();
+        obstacle_detected = true;
     }
 
-    // change face when obstacle detected
-    if (g_face != NULL) {
-        face_set_expression(g_face, FACE_GAH);
+    // only change face and set timer if an IR sensor triggered
+    if (obstacle_detected) {
+        if (g_face != NULL) {
+            face_set_expression(g_face, FACE_GAH);
+        }
+        timer0_hw->alarm[0] = timer0_hw->timerawl + 1000000; // 1 second
     }
-
-    timer0_hw->alarm[0] = timer0_hw->timerawl + 1000000; // 1 second
 }
 
 void timer0_irq_handler(){
