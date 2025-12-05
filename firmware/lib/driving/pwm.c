@@ -17,7 +17,7 @@ void init_fan(){
     pwm_init(slice_num, &cfg, false);
     gpio_set_function(FAN_PIN, GPIO_FUNC_PWM);
     pwm_set_wrap(slice_num, 10000);
-    pwm_set_chan_level(slice_num, PWM_CHAN_B, 0);
+    pwm_set_chan_level(slice_num, PWM_CHAN_B, 5000);
     pwm_set_enabled(slice_num, true);
 
     // init gpio (button irq)
