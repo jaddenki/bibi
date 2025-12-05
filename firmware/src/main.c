@@ -11,6 +11,7 @@
 #include "bibi_config.h"
 
 volatile bool notTurning = true;
+volatile bool state = 0;
 volatile bool notRandomizing = true;
 
 // 

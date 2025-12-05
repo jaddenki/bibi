@@ -30,11 +30,11 @@
 // bibi move
 // motor left
 #define MOTOR_L_PIN_A 27
-// #define MOTOR_L_PIN_B 27
+#define MOTOR_L_PIN_B 27
 
 // motor right
 #define MOTOR_R_PIN_A 20
-// #define MOTOR_R_PIN_B 28
+#define MOTOR_R_PIN_B 28
 
 // bibi clean
 #define FAN_PIN 23

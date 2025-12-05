@@ -7,6 +7,9 @@
 #include "hardware/irq.h"
 #include <stdio.h>
 
+volatile bool left = false;
+bool right = false;
+
 // initialize io_bank gpio handler, timer irq handler, and begin moving forward
 void init_auto_driving(){
     irq_set_enabled(IO_IRQ_BANK0, 1);
@@ -33,17 +36,21 @@ void io_bank_handler(){
     if(gpio_get_irq_event_mask(IR_PIN_RIGHT) == GPIO_IRQ_EDGE_FALL){
         gpio_acknowledge_irq(IR_PIN_RIGHT, GPIO_IRQ_EDGE_FALL);
         notTurning = false;
-        stop();
-        forward_r();
+        right = true;
         obstacle_detected = true;
     }
     else if(gpio_get_irq_event_mask(IR_PIN_LEFT) == GPIO_IRQ_EDGE_FALL){
         gpio_acknowledge_irq(IR_PIN_LEFT, GPIO_IRQ_EDGE_FALL);
         notTurning = false;
-        stop();
-        forward_l();
+        left = true;
         obstacle_detected = true;
     }
+
+    // reverse both motors
+    stop();
+    reverse_l();
+    reverse_r();
+    state = 0;
 
     // only change face and set timer if an IR sensor triggered
     if (obstacle_detected) {
@@ -57,8 +64,29 @@ void io_bank_handler(){
 void timer0_irq_handler(){
     // clear interrupt
     timer0_hw->intr = 1u << 0;
-    stop();
-    forward_l();
-    forward_r();
-    notTurning = true;
+    if(!state){
+        if(left){
+            // turn right
+            stop();
+            forward_l();
+            reverse_r();
+        }
+        else if(right){
+            // turn left
+            stop();
+            reverse_l();
+            forward_r();
+        }
+        timer0_hw->alarm[0] = timer0_hw->timerawl + 1000000;
+        state = 1;
+    }
+    else{
+        // go forward again
+        left = false;
+        right = false;
+        stop();
+        forward_l();
+        forward_r();
+        notTurning = true;
+    }
 }
