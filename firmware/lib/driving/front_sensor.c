@@ -11,6 +11,7 @@ void init_adc() {
     adc_init();
     adc_gpio_init(IR_PIN_FRONT);
     adc_select_input(7);
+    adc_run(1);
 }
 
 uint16_t read_adc() {
@@ -18,7 +19,9 @@ uint16_t read_adc() {
 }
 
 void interpret_front_sensor(uint16_t value) {
-    if(value > 0x4000){
+    printf("%d\n", value);
+    fflush(stdout);
+    if(value > 0x0400){
         // obstacle detected in front
         if (g_face != NULL) {
             face_set_expression(g_face, FACE_GAH);

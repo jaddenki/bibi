@@ -3,6 +3,7 @@
 #include "../face_subsystem/face_controller.h"
 #include "hardware/pwm.h"
 #include "state.h"
+#include "../face_subsystem/face_controller.h"
 #include <stdio.h>
 #include <stdlib.h>
 
