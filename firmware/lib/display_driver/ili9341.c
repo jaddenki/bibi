@@ -185,8 +185,6 @@ void ili9341_init(ili9341_t *display, spi_inst_t *spi, uint8_t cs, uint8_t dc, u
     ili9341_write_command(display, ILI9341_SLPOUT);
     sleep_ms(120);
 
-    // ili9341_write_command(display, ILI9341_INVON);
-
     ili9341_write_command(display, ILI9341_DISPON);
     sleep_ms(20);
 }
@@ -200,6 +198,7 @@ void ili9341_write_data_dma(ili9341_t *display, const uint8_t *data, size_t len)
     dma_channel_wait_for_finish_blocking(display->dma_tx);
     
     while (spi_is_busy(display->spi)) tight_loop_contents();
+    
     cs_deselect(display);
 }
 
@@ -232,8 +231,10 @@ void ili9341_fill_rect(ili9341_t *display, uint16_t x, uint16_t y, uint16_t w, u
         dma_channel_set_read_addr(display->dma_tx, dma_buffer, false);
         dma_channel_set_trans_count(display->dma_tx, chunk, true);
         dma_channel_wait_for_finish_blocking(display->dma_tx);
-        
         total_bytes -= chunk;
     }
+    
+    while (spi_is_busy(display->spi)) tight_loop_contents();
+    
     cs_deselect(display);
 }
