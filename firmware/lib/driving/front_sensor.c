@@ -18,12 +18,13 @@ uint16_t read_adc() {
 }
 
 void interpret_front_sensor(uint16_t value) {
-    //printf("%d\n", value);
-    //fflush(stdout);
-    if(value > 0xF8){
+    printf("%d\n", value);
+    sleep_ms(100);
+    if(value > 0x337){
         // obstacle detected in front
         if (g_face != NULL) {
             face_set_expression(g_face, FACE_GAH);
+            printf("GAH");
         }
         
         // begin turning sequence

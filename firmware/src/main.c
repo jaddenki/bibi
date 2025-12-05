@@ -36,16 +36,20 @@ int main() {
     init_fan();
 
     for(;;) {
-            // interpret_front_sensor(read_adc());
         if(notTurning) {
+            printf("i'm not turning lol\n");
+            interpret_front_sensor(read_adc());
             face_update(g_face);
             face_draw(g_face);
-            interpret_front_sensor(read_adc());
         }
         else {
+            printf("i'm turning lol");
             face_update(g_face);
             face_draw(g_face);
         }
+
+        // printf("%d\n", read_adc());
+        // sleep_ms(100);
     }
     
     return 0;

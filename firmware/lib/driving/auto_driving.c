@@ -60,4 +60,5 @@ void timer0_irq_handler(){
     stop();
     forward_l();
     forward_r();
+    notTurning = true;
 }
