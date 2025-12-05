@@ -25,8 +25,8 @@ void face_controller_init(face_controller_t *face, ili9341_t *display,
     animation_init(&face->gah_anim, gah, 16, 16, 8, 50, false);
     
 
-    // gamblibi: 16x16, 8 frames, 50ms per frame, don't loop (play once)
-    animation_init(&face->gamblibi_anim, gamblibi, 16, 16, 8, 50, false);
+    // gamblibi: 16x16, 10 frames, 125ms per frame, don't loop (play once)
+    animation_init(&face->gamblibi_anim, gamblibi, 16, 16, 10, 125, false);
 
     face->current_expression = FACE_IDLE;
     face->current_anim = &face->idle_anim;
