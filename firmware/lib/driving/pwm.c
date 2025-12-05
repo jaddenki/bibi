@@ -41,6 +41,7 @@ void fan_button_irq_handler(){
             if (g_face != NULL) {
                 face_set_expression(g_face, FACE_GAMBLIBI);
             }
+            notRandomizing = true;
         }
     }
 }
