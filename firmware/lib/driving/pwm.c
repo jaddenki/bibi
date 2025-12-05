@@ -16,7 +16,7 @@ void init_fan(){
     pwm_init(slice_num, &cfg, false);
     gpio_set_function(FAN_PIN, GPIO_FUNC_PWM);
     pwm_set_wrap(slice_num, 10000);
-    pwm_set_chan_level(slice_num, PWM_CHAN_B, 0);
+    pwm_set_chan_level(slice_num, PWM_CHAN_B, 5000);
     pwm_set_enabled(slice_num, true);
 
     // init gpio (button irq)
@@ -35,7 +35,7 @@ void fan_button_irq_handler(){
         gpio_acknowledge_irq(RAND_BUTTON, GPIO_IRQ_EDGE_FALL);
         if(notRandomizing){
             notRandomizing = false;
-            pwm_set_chan_level(pwm_gpio_to_slice_num(FAN_PIN), PWM_CHAN_B, rand() % 10000);
+            pwm_set_chan_level(pwm_gpio_to_slice_num(FAN_PIN), PWM_CHAN_B, (rand() % 7000) + 3000);
             timer1_hw->alarm[0] = timer1_hw->timerawl + 1250000;
             
             // GAMBLIBIIIIII
