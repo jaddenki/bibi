@@ -11,7 +11,7 @@ void init_adc() {
     adc_init();
     adc_gpio_init(IR_PIN_FRONT);
     adc_select_input(7);
-    adc_run(1);
+    // adc_run(1);
 }
 
 uint16_t read_adc() {
