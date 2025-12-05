@@ -36,7 +36,9 @@ int main() {
     init_fan();
 
     printf("good morning\n");
+    fflush(stdout);
     printf("godo moringin again\n");
+    fflush(stdout);
 
     for(;;) {
             // interpret_front_sensor(read_adc());
