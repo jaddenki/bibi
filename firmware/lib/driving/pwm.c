@@ -36,7 +36,7 @@ void fan_button_irq_handler(){
         if(notRandomizing){
             notRandomizing = false;
             pwm_set_chan_level(pwm_gpio_to_slice_num(FAN_PIN), PWM_CHAN_B, rand() % 10000);
-            timer1_hw->alarm[0] = timer1_hw->timerawl + 400000;
+            timer1_hw->alarm[0] = timer1_hw->timerawl + 1250000;
             
             // GAMBLIBIIIIII
             if (g_face != NULL) {
